@@ -78,15 +78,14 @@ module spi_slave_axi_plug
 		);
 	
 	logic [31:0] curr_addr;
-	logic [63:0] curr_data_rx;
+	logic [32:0] curr_data_rx;
 	logic [63:0] curr_data_tx;
 	logic  [7:0] curr_be;
 	logic        incr_addr_w;
 	logic        incr_addr_r;
 	logic        tx_is_lsb;
 	logic        tx_is_lsb_next;
-	logic        sample_MSB;
-	logic        sample_LSB;
+	logic        sample_fifo;
 	logic        sample_axidata;
 	
 	enum logic [2:0] {IDLE,DATA,AXIADDR,AXIDATA,AXIRESP} AR_CS,AR_NS,AW_CS,AW_NS;
@@ -107,22 +106,16 @@ module spi_slave_axi_plug
 		begin
 			AW_CS = AW_NS;
 			AR_CS = AR_NS;
-			if (sample_LSB)
+			if (sample_fifo)
 			begin
-				curr_data_rx = {curr_data_rx[31:0],rx_data};
-				curr_be            = 8'hFF;
-			end
-			if (sample_MSB)
-			begin
-				curr_data_rx[31:0] = rx_data;
-				curr_be            = 8'h0F;
+				curr_data_rx = rx_data;
 			end
 			if (sample_axidata)
 				curr_data_tx = axi_master_r_data;
 			if (rxtx_addr_valid)
 				curr_addr = rxtx_addr;
 			else if (incr_addr_w | incr_addr_r)
-				curr_addr = curr_addr + 32'h8;
+				curr_addr = curr_addr + 32'h4;
 			tx_is_lsb = tx_is_lsb_next;
 		end
 	end
@@ -131,8 +124,7 @@ module spi_slave_axi_plug
 	always_comb
 	begin
 		AW_NS      = IDLE;
-		sample_MSB = 1'b0;
-		sample_LSB = 1'b0;
+		sample_fifo = 1'b0;
 		rx_ready   = 1'b0;
 		axi_master_aw_valid = 1'b0;
 		axi_master_w_valid  = 1'b0;
@@ -143,31 +135,13 @@ module spi_slave_axi_plug
 			begin
 				if(rx_valid)
 				begin
-					sample_MSB = 1'b1;
-					rx_ready   = 1'b1;
-					AW_NS      = DATA;
+					sample_fifo = 1'b1;
+					rx_ready    = 1'b1;
+					AW_NS       = AXIADDR;
 				end
 				else
 				begin
 					AW_NS      = IDLE;
-				end
-			end
-			DATA:
-			begin
-				if(rx_valid)
-				begin
-					sample_LSB = 1'b1;
-					rx_ready   = 1'b1;
-					AW_NS      = AXIADDR;
-				end
-				else
-				begin
-					if (cs)
-					begin
-						AW_NS      = AXIADDR;
-					end
-					else
-					AW_NS      = DATA;
 				end
 			end
 			AXIADDR:
@@ -182,7 +156,10 @@ module spi_slave_axi_plug
 			begin
 				axi_master_w_valid = 1'b1;
 				if (axi_master_w_ready)
+				begin
+					incr_addr_w         = 1'b1;
 					AW_NS = AXIRESP;
+				end
 				else
 					AW_NS = AXIDATA;
 			end
@@ -190,10 +167,7 @@ module spi_slave_axi_plug
 			begin
 				axi_master_b_ready = 1'b1;
 				if (axi_master_b_valid)
-				begin
-					incr_addr_w         = 1'b1;
 					AW_NS = IDLE;
-				end
 				else
 					AW_NS = AXIRESP;
 			end
@@ -287,8 +261,8 @@ module spi_slave_axi_plug
 		assign axi_master_aw_id     =  'h1;
 		assign axi_master_aw_user   =  'h0;
 
-		assign axi_master_w_data    = curr_data_rx;
-		assign axi_master_w_strb    = curr_be;
+		assign axi_master_w_data    = curr_addr[2] ? {curr_data_rx,32'h0}:{32'h0,curr_data_rx};
+		assign axi_master_w_strb    = curr_addr[2] ? 8'hF0 : 8'h0F;
 		assign axi_master_w_user    =  'h0;
 		assign axi_master_w_last    = 1'b1;
 
