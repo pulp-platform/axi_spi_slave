@@ -253,7 +253,7 @@ module spi_slave_axi_plug
 		assign axi_master_aw_prot   =  'h0;
 		assign axi_master_aw_region =  'h0;
 		assign axi_master_aw_len    =  'h0;
-		assign axi_master_aw_size   =  'h0;
+		assign axi_master_aw_size   = 3'b010;
 		assign axi_master_aw_burst  =  'h0;
 		assign axi_master_aw_lock   =  'h0;
 		assign axi_master_aw_cache  =  'h0;
@@ -270,7 +270,7 @@ module spi_slave_axi_plug
 		assign axi_master_ar_prot   =  'h0;
 		assign axi_master_ar_region =  'h0;
 		assign axi_master_ar_len    =  'h0;
-		assign axi_master_ar_size   =  'h0;
+		assign axi_master_ar_size   = 3'b011;
 		assign axi_master_ar_burst  =  'h0;
 		assign axi_master_ar_lock   =  'h0;
 		assign axi_master_ar_cache  =  'h0;

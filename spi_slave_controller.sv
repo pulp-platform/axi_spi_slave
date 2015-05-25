@@ -69,6 +69,8 @@ module spi_slave_controller
 	logic        tx_done_reg;
 	logic  [1:0] pad_mode_next;
 	
+	logic  [7:0] s_dummy_cycles;
+	
 	assign command = decode_cmd_comb ? rx_data : cmd_reg;
 	
 	spi_slave_cmd_parser u_cmd_parser(
@@ -94,6 +96,7 @@ module spi_slave_controller
 			.wr_data_valid(reg_valid),
 			.rd_data(reg_data),
 			.rd_addr(reg_sel),
+			.dummy_cycles(s_dummy_cycles),
 			.en_qpi(en_quad)
 			);
 	always_comb
@@ -160,7 +163,7 @@ module spi_slave_controller
 					if (wait_dummy)
 					begin
 						state_next     = DUMMY;
-						rx_counter     = DUMMY_CYCLES;
+						rx_counter     = s_dummy_cycles;
 						rx_counter_upd = 1;
 					end
 					else if (send_data)

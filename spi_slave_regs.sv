@@ -8,6 +8,7 @@ module spi_slave_regs #(
 		input  logic       wr_data_valid,
 		output logic [REG_SIZE-1:0] rd_data,
 		input  logic [1:0] rd_addr,
+		output logic [7:0] dummy_cycles,
 		output logic       en_qpi
 		);
 	
@@ -16,8 +17,8 @@ module spi_slave_regs #(
 	logic [REG_SIZE-1:0] reg2;
 	logic [REG_SIZE-1:0] reg3;
 	
-	assign en_qpi = reg0[0];
-		
+	assign en_qpi       = reg0[0];
+	assign dummy_cycles = reg1;
 	always_comb
 	begin
 		case(rd_addr)
@@ -37,7 +38,7 @@ module spi_slave_regs #(
 		if (rstn == 0)
 		begin
 			reg0= 'h0;
-			reg1= 'h0;
+			reg1= 'd32;
 			reg2= 'h0;
 			reg3= 'h0;
 		end
