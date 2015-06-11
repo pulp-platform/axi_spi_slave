@@ -101,8 +101,8 @@ module spi_slave_axi_plug
 		end
 		else
 		begin
-			AW_CS = AW_NS;
-			AR_CS = AR_NS;
+			AW_CS <= AW_NS;
+			AR_CS <= AR_NS;
 			if (sample_fifo)
 			begin
 				curr_data_rx <= rx_data;
