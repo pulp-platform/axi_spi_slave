@@ -115,7 +115,7 @@ module spi_slave_axi_plug
 			if (rxtx_addr_valid)
 				curr_addr = rxtx_addr;
 			else if (incr_addr_w | incr_addr_r)
-				curr_addr = curr_addr + 32'h4;
+				curr_addr = curr_addr + 32'h4; /// ?????? <<<< FIXME FIXME WIP
 			tx_is_lsb = tx_is_lsb_next;
 		end
 	end
