@@ -83,8 +83,6 @@ module spi_slave_axi_plug
 	logic  [7:0] curr_be;
 	logic        incr_addr_w;
 	logic        incr_addr_r;
-	logic        tx_is_lsb;
-	logic        tx_is_lsb_next;
 	logic        sample_fifo;
 	logic        sample_axidata;
 	
@@ -94,13 +92,12 @@ module spi_slave_axi_plug
 	begin
 		if (axi_aresetn == 0)
 		begin
-			AW_CS         = IDLE;
-			AR_CS         = IDLE;
-			curr_data_rx  =  'h0;
-			curr_data_tx  =  'h0;
-			curr_addr     =  'h0;
-			tx_is_lsb     = 1'b0;
-			curr_be       =  'h0;
+			AW_CS         <= IDLE;
+			AR_CS         <= IDLE;
+			curr_data_rx  <=  'h0;
+			curr_data_tx  <=  'h0;
+			curr_addr     <=  'h0;
+			curr_be       <=  'h0;
 		end
 		else
 		begin
@@ -108,15 +105,14 @@ module spi_slave_axi_plug
 			AR_CS = AR_NS;
 			if (sample_fifo)
 			begin
-				curr_data_rx = rx_data;
+				curr_data_rx <= rx_data;
 			end
 			if (sample_axidata)
-				curr_data_tx = axi_master_r_data;
+				curr_data_tx <= axi_master_r_data;
 			if (rxtx_addr_valid)
-				curr_addr = rxtx_addr;
+				curr_addr <= rxtx_addr;
 			else if (incr_addr_w | incr_addr_r)
-				curr_addr = curr_addr + 32'h4; /// ?????? <<<< FIXME FIXME WIP
-			tx_is_lsb = tx_is_lsb_next;
+				curr_addr <= curr_addr + 32'h4;
 		end
 	end
 	
@@ -179,7 +175,6 @@ module spi_slave_axi_plug
 	begin
 		AR_NS               = IDLE;
 		tx_valid            = 1'b0;
-		tx_is_lsb_next      = 1'b0;
 		axi_master_ar_valid = 1'b0;
 		axi_master_r_ready  = 1'b0;
 		incr_addr_r         = 1'b0;
@@ -207,16 +202,8 @@ module spi_slave_axi_plug
 				begin
 					if(tx_ready)
 					begin
-						if (tx_is_lsb)
-						begin
-							incr_addr_r = 1'b1;
-							AR_NS       = AXIADDR;
-						end
-						else
-						begin
-							tx_is_lsb_next = 1'b1;
-							AR_NS      = DATA;
-						end
+						incr_addr_r = 1'b1;
+						AR_NS       = AXIADDR;
 					end
 					else
 					begin
@@ -247,7 +234,8 @@ module spi_slave_axi_plug
 		endcase
 	end
 	
-	assign tx_data = (tx_is_lsb) ? curr_data_tx[31:0] : curr_data_tx[63:32];
+	// for now, let us support only 32-bit reads!
+	assign tx_data = curr_data_tx[31:0];
 	
 	    assign axi_master_aw_addr   =  curr_addr;
 		assign axi_master_aw_prot   =  'h0;
