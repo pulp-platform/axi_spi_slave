@@ -96,6 +96,54 @@ module spi_slave_cmd_parser(
 				wait_dummy     = 1'b0;
 				reg_sel        = 2'b01;
 			end
+			8'h20: // write reg2
+			begin
+				get_addr       = 1'b0;
+				get_mode       = 1'b0;
+				get_data       = 1'b1;
+				send_data      = 1'b0;
+				enable_cont    = 1'b0;
+				enable_regs    = 1'b1;
+				error          = 1'b0;
+				wait_dummy     = 1'b0;
+				reg_sel        = 2'b10;
+			end
+			8'h21: // read reg2
+			begin
+				get_addr       = 1'b0;
+				get_mode       = 1'b0;
+				get_data       = 1'b0;
+				send_data      = 1'b1;
+				enable_cont    = 1'b0;
+				enable_regs    = 1'b1;
+				error          = 1'b0;
+				wait_dummy     = 1'b0;
+				reg_sel        = 2'b10;
+			end
+			8'h30: // write reg3
+			begin
+				get_addr       = 1'b0;
+				get_mode       = 1'b0;
+				get_data       = 1'b1;
+				send_data      = 1'b0;
+				enable_cont    = 1'b0;
+				enable_regs    = 1'b1;
+				error          = 1'b0;
+				wait_dummy     = 1'b0;
+				reg_sel        = 2'b11;
+			end
+			8'h31: // read reg3
+			begin
+				get_addr       = 1'b0;
+				get_mode       = 1'b0;
+				get_data       = 1'b0;
+				send_data      = 1'b1;
+				enable_cont    = 1'b0;
+				enable_regs    = 1'b1;
+				error          = 1'b0;
+				wait_dummy     = 1'b0;
+				reg_sel        = 2'b11;
+			end
 		endcase
 	end
 	

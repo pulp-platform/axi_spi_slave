@@ -116,6 +116,8 @@ module axi_spi_slave
     logic        tx_done;
     logic        rd_wr_sync;
 
+    logic [15:0] wrap_length;
+
     spi_slave_rx u_rxreg 
     (
         .sclk(spi_sclk),
@@ -176,7 +178,8 @@ module axi_spi_slave
         .ctrl_data_rx_ready(ctrl_data_rx_ready),
         .ctrl_data_tx(ctrl_data_tx),
         .ctrl_data_tx_valid(ctrl_data_tx_valid),
-        .ctrl_data_tx_ready(ctrl_data_tx_ready)
+        .ctrl_data_tx_ready(ctrl_data_tx_ready),
+        .wrap_length(wrap_length)
     );
 
     spi_slave_dc_fifo
@@ -281,7 +284,8 @@ module axi_spi_slave
         .tx_ready(fifo_data_tx_ready),
         .rx_data(fifo_data_rx),
         .rx_valid(fifo_data_rx_valid),
-        .rx_ready(fifo_data_rx_ready)
+        .rx_ready(fifo_data_rx_ready),
+        .wrap_length(wrap_length)
     );
 
     spi_slave_syncro u_syncro

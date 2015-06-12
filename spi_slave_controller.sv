@@ -28,7 +28,8 @@ module spi_slave_controller
 		input  logic        ctrl_data_rx_ready,
 		input  logic [31:0] ctrl_data_tx,
 		input  logic        ctrl_data_tx_valid,
-		output logic        ctrl_data_tx_ready
+		output logic        ctrl_data_tx_ready,
+		output logic [15:0] wrap_length
 		);
 	
 	localparam REG_SIZE = 8;
@@ -97,7 +98,8 @@ module spi_slave_controller
 			.rd_data(reg_data),
 			.rd_addr(reg_sel),
 			.dummy_cycles(s_dummy_cycles),
-			.en_qpi(en_quad)
+			.en_qpi(en_quad),
+			.wrap_length(wrap_length)
 			);
 	always_comb
 	begin

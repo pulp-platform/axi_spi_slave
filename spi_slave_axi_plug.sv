@@ -74,10 +74,13 @@ module spi_slave_axi_plug
 		input  logic                        tx_ready,
 		input  logic                 [31:0] rx_data,
 		input  logic                        rx_valid,
-		output logic                        rx_ready
+		output logic                        rx_ready,
+
+		input  logic                 [15:0] wrap_length
 		);
 	
 	logic [31:0] curr_addr;
+	logic [31:0] next_addr;
 	logic [32:0] curr_data_rx;
 	logic [63:0] curr_data_tx;
 	logic  [7:0] curr_be;
@@ -85,6 +88,9 @@ module spi_slave_axi_plug
 	logic        incr_addr_r;
 	logic        sample_fifo;
 	logic        sample_axidata;
+
+	// up to 64 kwords (256kB)
+	logic [15:0] tx_counter;
 	
 	enum logic [2:0] {IDLE,DATA,AXIADDR,AXIDATA,AXIRESP} AR_CS,AR_NS,AW_CS,AW_NS;
 	
@@ -112,10 +118,34 @@ module spi_slave_axi_plug
 			if (rxtx_addr_valid)
 				curr_addr <= rxtx_addr;
 			else if (incr_addr_w | incr_addr_r)
-				curr_addr <= curr_addr + 32'h4;
+				curr_addr <= next_addr;
+		end
+	end
+
+	always_ff @(posedge axi_aclk or negedge axi_aresetn)
+	begin
+		if (axi_aresetn == 1'b0)
+			tx_counter <= 16'h0;
+		else if(start_tx)
+			tx_counter <= 16'h0;
+		else if(incr_addr_w | incr_addr_r) begin
+			if(tx_counter == wrap_length-1)
+				tx_counter <= 16'h0;
+			else
+				tx_counter <= tx_counter + 16'h1;
 		end
 	end
 	
+	always_comb
+	begin
+		next_addr = 32'b0;
+		if(rxtx_addr_valid)
+			next_addr = rxtx_addr;
+		else if(tx_counter == wrap_length-1)
+			next_addr = rxtx_addr;
+		else
+			next_addr = curr_addr + 32'h4;
+	end
 	
 	always_comb
 	begin
