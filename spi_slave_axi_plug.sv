@@ -265,7 +265,7 @@ module spi_slave_axi_plug
 	end
 	
 	// for now, let us support only 32-bit reads!
-	assign tx_data = curr_data_tx[31:0];
+	assign tx_data = curr_addr[2] ? curr_data_tx[63:32] : curr_data_tx[31:0];
 	
 	    assign axi_master_aw_addr   =  curr_addr;
 		assign axi_master_aw_prot   =  'h0;
