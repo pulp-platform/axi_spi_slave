@@ -109,16 +109,16 @@ module axi_spi_slave
     logic        fifo_data_tx_valid;
     logic        fifo_data_tx_ready;
 
-    logic [31:0] addr_sync;
-    logic        addr_valid_sync;
-    logic        cs_sync;
+    logic [AXI_ADDR_WIDTH-1:0] addr_sync;
+    logic                      addr_valid_sync;
+    logic                      cs_sync;
 
     logic        tx_done;
     logic        rd_wr_sync;
 
     logic [15:0] wrap_length;
 
-    spi_slave_rx u_rxreg 
+    spi_slave_rx u_rxreg
     (
         .sclk(spi_sclk),
         .cs(spi_cs),
@@ -220,7 +220,7 @@ module axi_spi_slave
         .ready_b(ctrl_data_tx_ready)
     );
 
-    spi_slave_axi_plug 
+    spi_slave_axi_plug
     #(
         .AXI_ADDR_WIDTH(AXI_ADDR_WIDTH),
         .AXI_DATA_WIDTH(AXI_DATA_WIDTH),
@@ -288,7 +288,11 @@ module axi_spi_slave
         .wrap_length(wrap_length)
     );
 
-    spi_slave_syncro u_syncro
+    spi_slave_syncro
+    #(
+        .AXI_ADDR_WIDTH(AXI_ADDR_WIDTH)
+    )
+    u_syncro
     (
         .sys_clk(axi_aclk),
         .rstn(axi_aresetn),

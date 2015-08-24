@@ -1,14 +1,18 @@
-module spi_slave_syncro(
-		input  logic        sys_clk,
-		input  logic        rstn,
-		input  logic        cs,
-		input  logic [31:0] address,
-		input  logic        address_valid,
-		input  logic        rd_wr,
-		output logic        cs_sync,
-		output logic [31:0] address_sync,
-		output logic        address_valid_sync,
-		output logic        rd_wr_sync
+module spi_slave_syncro
+		#(
+		parameter AXI_ADDR_WIDTH = 32
+		)
+    (
+		input  logic                       sys_clk,
+		input  logic                       rstn,
+		input  logic                       cs,
+		input  logic [AXI_ADDR_WIDTH-1:0]  address,
+		input  logic                       address_valid,
+		input  logic                       rd_wr,
+		output logic                       cs_sync,
+		output logic [AXI_ADDR_WIDTH-1:0]  address_sync,
+		output logic                       address_valid_sync,
+		output logic                       rd_wr_sync
 		);
 	
 	logic [1:0] cs_reg;

@@ -9,8 +9,8 @@ module spi_slave_axi_plug
         
 		// AXI4 MASTER
 		//***************************************
-		input  logic        				axi_aclk,
-		input  logic        				axi_aresetn,
+		input  logic                        axi_aclk,
+		input  logic                        axi_aresetn,
 		// WRITE ADDRESS CHANNEL
 		output logic                        axi_master_aw_valid,
 		output logic [AXI_ADDR_WIDTH-1:0]   axi_master_aw_addr,
@@ -65,7 +65,7 @@ module spi_slave_axi_plug
 		input  logic [AXI_USER_WIDTH-1:0]   axi_master_b_user,
 		output logic                        axi_master_b_ready,
 		
-		input  logic                 [31:0] rxtx_addr,
+		input  logic [AXI_ADDR_WIDTH-1:0]   rxtx_addr,
 		input  logic                        rxtx_addr_valid,
 		input  logic                        start_tx,
 		input  logic                        cs,
@@ -79,15 +79,14 @@ module spi_slave_axi_plug
 		input  logic                 [15:0] wrap_length
 		);
 	
-	logic [31:0] curr_addr;
-	logic [31:0] next_addr;
-	logic [32:0] curr_data_rx;
-	logic [63:0] curr_data_tx;
-	logic  [7:0] curr_be;
-	logic        incr_addr_w;
-	logic        incr_addr_r;
-	logic        sample_fifo;
-	logic        sample_axidata;
+	logic [AXI_ADDR_WIDTH-1:0] curr_addr;
+	logic [AXI_ADDR_WIDTH-1:0] next_addr;
+	logic [31:0]               curr_data_rx;
+	logic [AXI_DATA_WIDTH-1:0] curr_data_tx;
+	logic                      incr_addr_w;
+	logic                      incr_addr_r;
+	logic                      sample_fifo;
+	logic                      sample_axidata;
 
 	// up to 64 kwords (256kB)
 	logic [15:0] tx_counter;
@@ -103,7 +102,6 @@ module spi_slave_axi_plug
 			curr_data_rx  <=  'h0;
 			curr_data_tx  <=  'h0;
 			curr_addr     <=  'h0;
-			curr_be       <=  'h0;
 		end
 		else
 		begin
@@ -263,38 +261,45 @@ module spi_slave_axi_plug
 			
 		endcase
 	end
-	
+
 	// for now, let us support only 32-bit reads!
-	assign tx_data = curr_addr[2] ? curr_data_tx[63:32] : curr_data_tx[31:0];
-	
-	    assign axi_master_aw_addr   =  curr_addr;
-		assign axi_master_aw_prot   =  'h0;
-		assign axi_master_aw_region =  'h0;
-		assign axi_master_aw_len    =  'h0;
-		assign axi_master_aw_size   = 3'b010;
-		assign axi_master_aw_burst  =  'h0;
-		assign axi_master_aw_lock   =  'h0;
-		assign axi_master_aw_cache  =  'h0;
-		assign axi_master_aw_qos    =  'h0;
-		assign axi_master_aw_id     =  'h1;
-		assign axi_master_aw_user   =  'h0;
+	generate if (AXI_DATA_WIDTH == 32)
+		assign tx_data = curr_data_tx[31:0];
+	else
+		assign tx_data = curr_addr[2] ? curr_data_tx[63:32] : curr_data_tx[31:0];
+	endgenerate
 
-		assign axi_master_w_data    = curr_addr[2] ? {curr_data_rx,32'h0}:{32'h0,curr_data_rx};
+	assign axi_master_aw_addr   =  curr_addr;
+	assign axi_master_aw_prot   =  'h0;
+	assign axi_master_aw_region =  'h0;
+	assign axi_master_aw_len    =  'h0;
+	assign axi_master_aw_size   = 3'b010;
+	assign axi_master_aw_burst  =  'h0;
+	assign axi_master_aw_lock   =  'h0;
+	assign axi_master_aw_cache  =  'h0;
+	assign axi_master_aw_qos    =  'h0;
+	assign axi_master_aw_id     =  'h1;
+	assign axi_master_aw_user   =  'h0;
+
+	assign axi_master_w_data    = {AXI_DATA_WIDTH/32{curr_data_rx}}; // replicate curr_data_rx as often as needed
+	generate if (AXI_DATA_WIDTH == 32)
+		assign axi_master_w_strb    = 4'hF;
+	else
 		assign axi_master_w_strb    = curr_addr[2] ? 8'hF0 : 8'h0F;
-		assign axi_master_w_user    =  'h0;
-		assign axi_master_w_last    = 1'b1;
+	endgenerate
+	assign axi_master_w_user    =  'h0;
+	assign axi_master_w_last    = 1'b1;
 
-		assign axi_master_ar_addr   =  curr_addr;
-		assign axi_master_ar_prot   =  'h0;
-		assign axi_master_ar_region =  'h0;
-		assign axi_master_ar_len    =  'h0;
-		assign axi_master_ar_size   = 3'b011;
-		assign axi_master_ar_burst  =  'h0;
-		assign axi_master_ar_lock   =  'h0;
-		assign axi_master_ar_cache  =  'h0;
-		assign axi_master_ar_qos    =  'h0;
-		assign axi_master_ar_id     =  'h1;
-		assign axi_master_ar_user   =  'h0;
-		
-	
+	assign axi_master_ar_addr   =  curr_addr;
+	assign axi_master_ar_prot   =  'h0;
+	assign axi_master_ar_region =  'h0;
+	assign axi_master_ar_len    =  'h0;
+	assign axi_master_ar_size   = 3'b011;
+	assign axi_master_ar_burst  =  'h0;
+	assign axi_master_ar_lock   =  'h0;
+	assign axi_master_ar_cache  =  'h0;
+	assign axi_master_ar_qos    =  'h0;
+	assign axi_master_ar_id     =  'h1;
+	assign axi_master_ar_user   =  'h0;
+
 endmodule
