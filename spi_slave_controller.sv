@@ -54,8 +54,8 @@ module spi_slave_controller
 
   logic [31:0] addr_reg;
   logic  [7:0] cmd_reg;
-  logic  [7:0] mode_reg;
-  logic [31:0] data_reg;
+  logic  [7:0] mode_reg; // FIXME ANTONIO: Signal not used
+  logic [31:0] data_reg; // FIXME ANTONIO: Signal not used
 
   logic        sample_ADDR;
   logic        sample_MODE;
@@ -64,7 +64,7 @@ module spi_slave_controller
 
   logic        get_addr;
   logic        wait_dummy;
-  logic        get_mode;
+  logic        get_mode; // FIXME ANTONIO: Signal not used
   logic        get_data;
   logic        send_data;
   logic        enable_cont;
@@ -85,18 +85,19 @@ module spi_slave_controller
 
   assign command = decode_cmd_comb ? rx_data[7:0] : cmd_reg;
 
-  spi_slave_cmd_parser u_cmd_parser(
-      .cmd(command),
-      .get_addr(get_addr),
-      .get_mode(get_mode),
-      .get_data(get_data),
-      .send_data(send_data),
-      .wait_dummy(wait_dummy),
-      .enable_cont(enable_cont),
-      .enable_regs(enable_regs),
-      .error(cmd_error),
-      .reg_sel(reg_sel)
-      );
+  spi_slave_cmd_parser u_cmd_parser
+  (
+      .cmd         ( command     ), // In,
+      .get_addr    ( get_addr    ), // Out,
+      .get_mode    ( get_mode    ), // Out, // FIXME ANTONIO: Signal not used
+      .get_data    ( get_data    ), // Out,
+      .send_data   ( send_data   ), // Out,
+      .wait_dummy  ( wait_dummy  ), // Out,
+      .enable_cont ( enable_cont ), // Out,
+      .enable_regs ( enable_regs ), // Out,
+      .error       ( cmd_error   ), // Out,
+      .reg_sel     ( reg_sel     )  // Out
+  );
 
   spi_slave_regs #(
       .REG_SIZE(REG_SIZE)
