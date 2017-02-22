@@ -83,7 +83,7 @@ module spi_slave_controller
 
   logic  [7:0] s_dummy_cycles;
 
-  assign command = decode_cmd_comb ? rx_data : cmd_reg;
+  assign command = decode_cmd_comb ? rx_data[7:0] : cmd_reg;
 
   spi_slave_cmd_parser u_cmd_parser(
       .cmd(command),
