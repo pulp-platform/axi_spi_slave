@@ -335,31 +335,31 @@ module spi_slave_controller
   begin
     if (cs == 1'b1)
     begin
-      addr_reg    = 'h0;
-      mode_reg    = 'h0;
-      data_reg    = 'h0;
-      cmd_reg     = 'h0;
-      tx_done_reg = 1'b0;
-      ctrl_addr_valid = 1'b0;
-      tx_counter_upd  = 1'b0;
-      tx_data_valid   = 1'b0;
-      ctrl_data_tx_ready = 1'b0;
-      tx_counter      =  'h0;
-      tx_data         =  'h0;
+      addr_reg            <= 'h0;
+      mode_reg            <= 'h0;
+      data_reg            <= 'h0;
+      cmd_reg             <= 'h0;
+      tx_done_reg         <= 1'b0;
+      ctrl_addr_valid     <= 1'b0;
+      tx_counter_upd      <= 1'b0;
+      tx_data_valid       <= 1'b0;
+      ctrl_data_tx_ready  <= 1'b0;
+      tx_counter          <=  'h0;
+      tx_data             <=  'h0;
     end
     else
     begin
-      if (sample_ADDR) addr_reg = rx_data;
-      if (sample_MODE) mode_reg = rx_data[7:0];
-      if (sample_CMD)  cmd_reg  = rx_data[7:0];
-      if (sample_DATA) data_reg = rx_data;
-      ctrl_addr_valid = sample_ADDR;
-      tx_counter_upd  = tx_counter_upd_next;
-      tx_counter      = tx_counter_next;
-      tx_data_valid   = tx_data_valid_next;
-      tx_done_reg     = tx_done;
-      ctrl_data_tx_ready = ctrl_data_tx_ready_next;
-      tx_data      = (enable_regs) ? reg_data : ctrl_data_tx;
+      if (sample_ADDR) addr_reg <= rx_data;
+      if (sample_MODE) mode_reg <= rx_data[7:0];
+      if (sample_CMD)  cmd_reg  <= rx_data[7:0];
+      if (sample_DATA) data_reg <= rx_data;
+      ctrl_addr_valid           <= sample_ADDR;
+      tx_counter_upd            <= tx_counter_upd_next;
+      tx_counter                <= tx_counter_next;
+      tx_data_valid             <= tx_data_valid_next;
+      tx_done_reg               <= tx_done;
+      ctrl_data_tx_ready        <= ctrl_data_tx_ready_next;
+      tx_data                   <= (enable_regs) ? reg_data : ctrl_data_tx;
     end
   end
 

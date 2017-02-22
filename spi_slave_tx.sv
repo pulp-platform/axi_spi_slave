@@ -102,17 +102,17 @@ module spi_slave_tx
     begin
         if (cs == 1'b1)
         begin
-            counter      = 'h0;
-            counter_trgt = 'h7;
-            data_int     = 'h0;
-            running      = 1'b0;
+            counter      <= 'h0;
+            counter_trgt <= 'h7;
+            data_int     <= 'h0;
+            running      <= 1'b0;
         end
         else
         begin
-            counter      = counter_next;
-            counter_trgt = counter_trgt_next;
-            data_int     = data_int_next;
-            running      = running_next;
+            counter      <= counter_next;
+            counter_trgt <= counter_trgt_next;
+            data_int     <= data_int_next;
+            running      <= running_next;
         end
     end
 endmodule

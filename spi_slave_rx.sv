@@ -81,17 +81,17 @@ module spi_slave_rx
     begin
         if (cs == 1'b1)
         begin
-            counter      = 0;
-            counter_trgt = 'h1;
-            data_int     = 'h0;
-            running      = 'h1;
+            counter      <= 0;
+            counter_trgt <= 'h1;
+            data_int     <= 'h0;
+            running      <= 'h1;
         end
         else
         begin
-            counter      = counter_next;
-            counter_trgt = counter_trgt_next;
-            data_int     = data_int_next;
-            running      = running_next;
+            counter      <= counter_next;
+            counter_trgt <= counter_trgt_next;
+            data_int     <= data_int_next;
+            running      <= running_next;
         end
     end
 endmodule
