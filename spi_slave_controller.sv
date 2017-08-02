@@ -59,8 +59,8 @@ module spi_slave_controller
 
   logic [31:0] addr_reg;
   logic  [7:0] cmd_reg;
-  logic  [7:0] mode_reg; // FIXME ANTONIO: Signal not used
-  logic [31:0] data_reg; // FIXME ANTONIO: Signal not used
+  logic  [7:0] mode_reg;
+  logic [31:0] data_reg;
 
   logic        sample_ADDR;
   logic        sample_MODE;
@@ -69,7 +69,7 @@ module spi_slave_controller
 
   logic        get_addr;
   logic        wait_dummy;
-  logic        get_mode; // FIXME ANTONIO: Signal not used
+  logic        get_mode;
   logic        get_data;
   logic        send_data;
   logic        enable_cont;
@@ -94,7 +94,7 @@ module spi_slave_controller
   (
       .cmd         ( command     ), // In,
       .get_addr    ( get_addr    ), // Out,
-      .get_mode    ( get_mode    ), // Out, // FIXME ANTONIO: Signal not used
+      .get_mode    ( get_mode    ), // Out,
       .get_data    ( get_data    ), // Out,
       .send_data   ( send_data   ), // Out,
       .wait_dummy  ( wait_dummy  ), // Out,
