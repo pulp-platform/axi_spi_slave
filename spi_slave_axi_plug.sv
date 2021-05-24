@@ -1,4 +1,4 @@
-// Copyright 2015 ETH Zurich and University of Bologna.
+// Copyright 2017 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
 // License, Version 0.51 (the “License”); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
@@ -100,7 +100,12 @@ module spi_slave_axi_plug
   // up to 64 kwords (256kB)
   logic [15:0] tx_counter;
 
+  // Internal wrap lenght
+
   enum logic [2:0] {IDLE,DATA,AXIADDR,AXIDATA,AXIRESP} AR_CS,AR_NS,AW_CS,AW_NS;
+
+  // Check if the wrap lenght is equal to '0'
+  assign wrap_length_t = (wrap_length == 0) ? 15'h1 : wrap_length;
 
   always_ff @(posedge axi_aclk or negedge axi_aresetn)
   begin
@@ -136,7 +141,7 @@ module spi_slave_axi_plug
     else if(start_tx)
       tx_counter <= 16'h0;
     else if(incr_addr_w | incr_addr_r) begin
-      if(tx_counter == wrap_length-1)
+      if(tx_counter == wrap_length_t-1)
         tx_counter <= 16'h0;
       else
         tx_counter <= tx_counter + 16'h1;
@@ -148,7 +153,7 @@ module spi_slave_axi_plug
     next_addr = 32'b0;
     if(rxtx_addr_valid)
       next_addr = rxtx_addr;
-    else if(tx_counter == wrap_length-1)
+    else if(tx_counter == wrap_length_t-1)
       next_addr = rxtx_addr;
     else
       next_addr = curr_addr + 32'h4;
@@ -238,11 +243,16 @@ module spi_slave_axi_plug
         else
         begin
           if(tx_ready)
-          begin
-            incr_addr_r = 1'b1;
-            AR_NS       = AXIADDR;
-          end
-          else
+            if(tx_counter == wrap_length_t-1)
+            begin
+              AR_NS = IDLE;
+            end
+            else
+            begin
+              incr_addr_r = 1'b1;
+              AR_NS       = AXIADDR;
+            end
+          else              
           begin
             AR_NS      = DATA;
           end
