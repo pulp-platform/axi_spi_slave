@@ -1,4 +1,4 @@
-// Copyright 2015 ETH Zurich and University of Bologna.
+// Copyright 2017 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
 // License, Version 0.51 (the “License”); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
@@ -50,10 +50,10 @@ module spi_slave_regs #(
   begin
     if (rstn == 0)
     begin
-      reg0= 'h0;
-      reg1= 'd32;
-      reg2= 'h0;
-      reg3= 'h0;
+      reg0 <= 'h0;
+      reg1 <= 'd32;
+      reg2 <= 'h0;
+      reg3 <= 'h0;
     end
     else
     begin
@@ -61,13 +61,13 @@ module spi_slave_regs #(
       begin
         case(wr_addr)
           2'b00:
-            reg0=wr_data;
+            reg0 <= wr_data;
           2'b01:
-            reg1=wr_data;
+            reg1 <= wr_data;
           2'b10:
-            reg2=wr_data;
+            reg2 <= wr_data;
           2'b11:
-            reg3=wr_data;
+            reg3 <= wr_data;
         endcase
       end
     end
