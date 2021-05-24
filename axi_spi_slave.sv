@@ -1,4 +1,4 @@
-// Copyright 2015 ETH Zurich and University of Bologna.
+// Copyright 2017 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
 // License, Version 0.51 (the “License”); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
@@ -20,7 +20,10 @@ module axi_spi_slave
     input  logic                        test_mode,
     input  logic                        spi_sclk,
     input  logic                        spi_cs,
-    output logic  [1:0]                 spi_mode,
+    output logic                        spi_oen0_o,
+    output logic                        spi_oen1_o,
+    output logic                        spi_oen2_o,
+    output logic                        spi_oen3_o,
     input  logic                        spi_sdi0,
     input  logic                        spi_sdi1,
     input  logic                        spi_sdi2,
@@ -125,6 +128,7 @@ module axi_spi_slave
 
     logic        tx_done;
     logic        rd_wr_sync;
+    logic [1:0]  pad_mode;
 
     logic [15:0] wrap_length;
 
@@ -148,6 +152,11 @@ module axi_spi_slave
         .test_mode      ( test_mode      ),
         .sclk           ( spi_sclk       ),
         .cs             ( spi_cs         ),
+        .pad_mode       ( pad_mode       ),
+        .spi_oen0_o     ( spi_oen0_o     ),
+        .spi_oen1_o     ( spi_oen1_o     ),
+        .spi_oen2_o     ( spi_oen2_o     ),
+        .spi_oen3_o     ( spi_oen3_o     ),
         .sdo0           ( spi_sdo0       ),
         .sdo1           ( spi_sdo1       ),
         .sdo2           ( spi_sdo2       ),
@@ -170,7 +179,7 @@ module axi_spi_slave
         .sys_rstn           ( axi_aresetn        ),
         .cs                 ( spi_cs             ),
         .en_quad            ( en_quad            ),
-        .pad_mode           ( spi_mode           ),
+        .pad_mode           ( pad_mode           ),
         .rx_counter         ( rx_counter         ),
         .rx_counter_upd     ( rx_counter_upd     ),
         .rx_data            ( rx_data            ),
